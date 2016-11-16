@@ -1,4 +1,4 @@
-# `kokua`: an `R` package of helpful functions for the Hawaii Dimensions Project
+# kokua: an R package of helpful functions for the Hawaii Dimensions Project
 
 ## Things to include:
 1. useful data objects such as:
