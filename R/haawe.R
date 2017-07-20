@@ -26,11 +26,11 @@ haawe <- function(url, filename, extension){
         path <- file.path(dest, datafile)
         download.file(url = url, destfile = path, mode = 'wb') # Downloads to target directory
         if (length(unzip(path, list = TRUE)) > 0) { #  Checks if file is compressed
-            unzip(path, overwrite = TRUE, exdir = dest) #  Unzips file to same directory and keeps original compressed file
+            unzip(path, exdir = dest) #  Unzips file to same directory and keeps original compressed file
         }
     }
     #  If download was successful, the user is notified
-    print(paste(datafile, ' successfully loaded. Downloaded data can now be loaded into R by running: data(', path, ')', sep = ''))
+    print(paste(datafile, ' successfully loaded. Downloaded data can be loaded into R by running: data(', path, ')', sep = ''))
 }
 
 
