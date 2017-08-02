@@ -61,5 +61,7 @@ haawe <- function(url, name = NULL, ext) {
     invisible(path)
 }
 
-testURL <- 'http://gis.ess.washington.edu/data/raster/tenmeter/hawaii/niihau.zip' 
-haawe(testURL, 'niihau', '.zip')
+.file_ext <- function(path) {
+    pos <- regexpr("\\.([[:alnum:]]+)$", path)
+    ifelse(pos > -1L, substring(path, pos + 1L), "")
+}
