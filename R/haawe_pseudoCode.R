@@ -22,7 +22,7 @@ haawe_pseudo <- function(x, keyname = NULL) { # takes key/url and in case of url
         mapply(.loadData, unloaded$url, 
                           unloaded$key, 
                           .fileExt(unloaded$url), 
-                          file.path(.libPaths(), 'hdimDB', 'data', x)) #  Downloads each previously unloaded file with helper function
+                          file.path(.libPaths(), 'hdimDB', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
         dataKeys[dataKeys %in% unloaded, 'loaded'] <- TRUE #  If successful, grep the keys in unloaded and change their $loaded value to TRUE
     } else {
         stopifnot(is.character(keyname)) #  Verifies that keyname is a character string
@@ -54,6 +54,7 @@ haawe_pseudo <- function(x, keyname = NULL) { # takes key/url and in case of url
     # ....now that you have that (save the string object to a variable called `readFun`)....
     readFun <- suppressWarnings(.readSelect(list.files(dest, recursive = TRUE))) #  Constructs lists of strings of load functions for each file
     readFun <- readFun[!sapply(readFun, is.null)]
+    browser()
     stopifnot(length(readFun) == 1)
     readFun <- unlist(readFun)
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
