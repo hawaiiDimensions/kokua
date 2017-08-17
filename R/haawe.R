@@ -46,7 +46,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     } 
     # if `path` is to a single file, figure out its file extension
     # if `path` is a directory, look inside at what the file extensions are inside the directory
-    # (might need to recursively do this...that's something we should talk about on Thursday)
+    # (might need to recursively do this)
     
     # once you know the file extensions, figure out which spatial data reading 
     # function (`raster` or `readOGR`) you need and combine this info, with the filename 
@@ -71,7 +71,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
 .readSelect <- function(files) { #  Returns string of correct load function when given spacial filename 
     # For example, 
     # if you detected a file named `kauai.bil` you would need a string that says:
-    # 'raster(kauai.bil)'
+    # 'raster("kauai.bil")'
     # if you detected a file called `hawaii_state_geol_ageClean.shp` you would need:
     # readOGR('.', 'hawaii_state_geol_ageClean')
     
