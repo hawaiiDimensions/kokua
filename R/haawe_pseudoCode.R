@@ -13,7 +13,7 @@
 
 haawe_pseudo <- function(x, keyname = NULL) { # takes key/url and in case of url also a keyname argument
     data(dataKeys, package = 'hdimDB') #  Loads tracker dataframe of spacial data
-    if (length(grep(x, dataKeys$key) > 0)) { #  x is a key
+    if (is.null(keyname)) { #  x is a key
         keyData <- dataKeys[grep(x, dataKeys$key), ] #  Searches for all data corresponding to x argument
         unloaded <- keyData[, keyData$loaded == FALSE] #  Finds unloaded data corresponding to `key`
         if (length(unloaded) == 0) { #  Stop if there are no unloaded matches
@@ -22,7 +22,7 @@ haawe_pseudo <- function(x, keyname = NULL) { # takes key/url and in case of url
         mapply(.loadData, unloaded$url, 
                           unloaded$key, 
                           .fileExt(unloaded$url), 
-                          file.path(.libPaths(), 'hdimDB', 'data', paste(x, Sys.time()))) #  Downloads each previously unloaded file with helper function
+                          file.path(.libPaths(), 'hdimDB', 'data', x)) #  Downloads each previously unloaded file with helper function
         dataKeys[dataKeys %in% unloaded, 'loaded'] <- TRUE #  If successful, grep the keys in unloaded and change their $loaded value to TRUE
     } else {
         stopifnot(is.character(keyname)) #  Verifies that keyname is a character string
@@ -57,12 +57,12 @@ haawe_pseudo <- function(x, keyname = NULL) { # takes key/url and in case of url
     stopifnot(length(readFun) == 1)
     readFun <- unlist(readFun)
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
-    writeLines(con = file.path(.libPaths(), 'hdimDB', 'data', paste0(name, '.R'),
+    writeLines(con = file.path(.libPaths(), 'hdimDB', 'data', paste0(name, '.R')),
                text = c(sprintf('oldwd <- setwd(%s)', file.path(.libPaths(), 'hdimDB', 'data')),
                readFun, # this should be a STRING that you make above
                         # when you figure out the file extension and
                         # which function is needed for reading in
-               'setwd(oldwd) \n')))
+               'setwd(oldwd) \n'))
     #  If download was successful, the user is notified
     cat(paste0(filename, ' successfully loaded. Downloaded data can be loaded into R by running: data(', name,'.R)'))
     invisible(paste0(name, '.R'))
