@@ -12,5 +12,3 @@
 3. functions to standardize color schemes for plotting (e.g. age gradient)  
   
   
-#### Future Plans:
-1. functions to submit data to central kokua repository (look at vetting process)
