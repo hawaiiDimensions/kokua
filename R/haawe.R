@@ -1,3 +1,20 @@
+#' @title Prepares spacial data files to be loaded
+#'  
+#' @description \code{haawe} Organizes loaded data and generates an R script to load the data.
+#' 
+#' @details 
+#' 
+#' @param x A keyword for the data to be loaded or alternatively the URL where the data is located
+#' @param keyname The keyword to be assigned to the data in case that x is a URL
+#' 
+# @example 
+# haawe('islands')
+#' 
+#' @return Generated R script saved in the data directory of the kokua package.
+#'
+#' @author Edward Greg Huang <edwardgh@@berkeley.edu>
+#' @export
+
 ## this version of the function uses keyword strings to download data. it needs a place to store
 ## those keyword strings and their corresponding URLs. For that we can make a exported object
 ## in the hdimDB package, something like:
@@ -12,7 +29,7 @@
 ## column in `dataKeys`
 
 haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a keyname argument
-    data(dataKeys, package = 'hdimDB') #  Loads tracker dataframe of spacial data
+    data(dataKeys, package = 'kokua') #  Loads tracker dataframe of spacial data
     if (is.null(keyname)) { #  x is a key
         keyData <- dataKeys[grep(x, dataKeys$key), ] #  Searches for all data corresponding to x argument
         unloaded <- keyData[, keyData$loaded == FALSE] #  Finds unloaded data corresponding to `key`
@@ -22,15 +39,15 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
         mapply(.loadData, unloaded$url, 
                           unloaded$key, 
                           .fileExt(unloaded$url), 
-                          file.path(.libPaths(), 'hdimDB', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
+                          file.path(.libPaths(), 'kokua', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
         dataKeys[dataKeys$key %in% unloaded$key, 'loaded'] <- TRUE #  If successful, grep the keys in unloaded and change their $loaded value to TRUE
     } else {
         stopifnot(is.character(keyname)) #  Verifies that keyname is a character string
-        .loadData(x, keyname, .fileExt(x), dest = file.path(.libPaths(), 'hdimDB', 'data', keyname))
+        .loadData(x, keyname, .fileExt(x), dest = file.path(.libPaths(), 'kokua', 'data', keyname))
         newRow <- data.frame(key = keyname, url = x, loaded = TRUE)
         dataKeys <- rbind(dataKeys, newRow)
     }
-    save(dataKeys, file = file.path(.libPaths(), 'hdimDB', 'data', 'dataKeys.RData')) #  Updates dataKeys file to reflect newly loaded data
+    save(dataKeys, file = file.path(.libPaths(), 'kokua', 'data', 'dataKeys.RData')) #  Updates dataKeys file to reflect newly loaded data
 }
 
 .loadData <- function(url, name, ext, dest) {
@@ -57,8 +74,8 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     stopifnot(length(readFun) == 1)
     readFun <- unlist(readFun)
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
-    writeLines(con = file.path(.libPaths(), 'hdimDB', 'data', paste0(name, '.R')),
-               text = c(sprintf('oldwd <- setwd("%s")', file.path(.libPaths(), 'hdimDB', 'data')),
+    writeLines(con = file.path(.libPaths(), 'kokua', 'data', paste0(name, '.R')),
+               text = c(sprintf('oldwd <- setwd("%s")', file.path(.libPaths(), 'kokua', 'data')),
                         paste0(name, ' <- ', readFun), # this should be a STRING that you make above
                         # when you figure out the file extension and
                         # which function is needed for reading in
