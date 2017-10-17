@@ -70,22 +70,23 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     # info into a string that, if read by R, would load the data. 
     # ....now that you have that (save the string object to a variable called `readFun`)....
     readFun <- suppressWarnings(.readSelect(list.files(dest, recursive = TRUE))) #  Constructs lists of strings of load functions for each file
-    readFun <- readFun[!sapply(readFun, is.null)]
+    # readFun <- readFun[!sapply(readFun, is.null)]
     stopifnot(length(readFun) == 1)
     readFun <- unlist(readFun)
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
-    writeLines(con = file.path(.libPaths(), 'kokua', 'data', paste0(name, '.R')),
-               text = c(sprintf('oldwd <- setwd("%s")', file.path(.libPaths(), 'kokua', 'data')),
-                        paste0(name, ' <- ', readFun), # this should be a STRING that you make above
-                        # when you figure out the file extension and
-                        # which function is needed for reading in
-                        'setwd(oldwd) \n'))
+    loadString <- c(sprintf('oldwd <- setwd("%s")', file.path(.libPaths(), 'kokua', 'data')),
+                    paste0(name, ' <- ', readFun), paste0(name, ' <- ', .readSelect(list.files(dest, recursive = TRUE), proj = TRUE, name = name)), ###TO FILL ##),# this should be a STRING that you make above
+                    # when you figure out the file extension and
+                    # which function is needed for reading in
+                    'setwd(oldwd) \n')
+    print(loadString)
+    eval(parse(text = loadString))
     #  If download was successful, the user is notified
     cat(paste0(filename, ' successfully loaded. Downloaded data can be loaded into R by running: data(', name,')'))
-    invisible(paste0(name, '.R'))
+    # invisible(paste0(name, '.R'))
 }
 
-.readSelect <- function(files) { #  Returns string of correct load function when given spacial filename 
+.readSelect <- function(files, proj = FALSE, name = 0) { #  Returns string of correct loador projection function when given spacial filename 
     # For example, 
     # if you detected a file named `kauai.bil` you would need a string that says:
     # 'raster("kauai.bil")'
@@ -94,19 +95,22 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     
     # looks in directory and prioritizes '.bil'
     exts <- mapply(.fileExt, files) #  Finds extensions
-    scripts <- mapply(.scriptSelect, files, exts)
-    scripts <- scripts[!is.na(scripts)]
+    scripts <- mapply(.scriptSelect, files, exts, proj, name)
+    scripts <- scripts[!sapply(scripts, is.null)]
     return(scripts)
 }
+
 
 .scriptSelect <- function(f, ext) {
     switch(ext,
            'bil' = paste0("raster('", f, "')"),
-           'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')"))
+           'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')")
            # 'tif' = 
            # 'kml' = 
-    # support for addtional extensions to be added
+           # support for addtional extensions to be added
+    )
 }
+
 
 .fileExt <- function(path) { #  Retrieves the file extension of a string
     pos <- regexpr("\\.([[:alnum:]]+)$", path)
