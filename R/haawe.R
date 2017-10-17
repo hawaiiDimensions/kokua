@@ -104,11 +104,11 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     if (proj == FALSE) {
         switch(ext,
                'bil' = paste0("raster('", f, "')"),
-               'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')"))
-        )
+               'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')")
         # 'tif' = 
         # 'kml' = 
         # support for addtional extensions to be added
+        )
     } else {
         switch(ext,
                'bil' = paste0('projectRaster(', name, ', crs = CRS("', '+proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0', '"))'),
