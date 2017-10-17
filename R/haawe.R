@@ -105,7 +105,6 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
         switch(ext,
                'bil' = paste0("raster('", f, "')"),
                'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')"))
-        )
         # 'tif' = 
         # 'kml' = 
         # support for addtional extensions to be added
