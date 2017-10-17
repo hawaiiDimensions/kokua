@@ -37,9 +37,9 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
             stop('There are no unloaded data for the key specified') 
         } #  If the data aren't all loaded, load them with .loadData
         mapply(.loadData, unloaded$url, 
-                          unloaded$key, 
-                          .fileExt(unloaded$url), 
-                          file.path(.libPaths(), 'kokua', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
+               unloaded$key, 
+               .fileExt(unloaded$url), 
+               file.path(.libPaths(), 'kokua', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
         dataKeys[dataKeys$key %in% unloaded$key, 'loaded'] <- TRUE #  If successful, grep the keys in unloaded and change their $loaded value to TRUE
     } else {
         stopifnot(is.character(keyname)) #  Verifies that keyname is a character string
@@ -100,17 +100,25 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     return(scripts)
 }
 
-
-.scriptSelect <- function(f, ext) {
-    switch(ext,
-           'bil' = paste0("raster('", f, "')"),
-           'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')")
-           # 'tif' = 
-           # 'kml' = 
-           # support for addtional extensions to be added
-    )
+.scriptSelect <- function(f, ext, proj, name) {
+    if (proj == FALSE) {
+        switch(ext,
+               'bil' = paste0("raster('", f, "')"),
+               'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')"))
+        )
+        # 'tif' = 
+        # 'kml' = 
+        # support for addtional extensions to be added
+    } else {
+        switch(ext,
+               'bil' = paste0('projectRaster(', name, ', crs = CRS("', '+proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0', '"))'),
+               'shp' = paste0('spTransform(', name,', CRS("', '+proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0', '"))')
+               # 'tif' = 
+               # 'kml' = 
+               # support for addtional extensions to be added
+        )
+    }
 }
-
 
 .fileExt <- function(path) { #  Retrieves the file extension of a string
     pos <- regexpr("\\.([[:alnum:]]+)$", path)
