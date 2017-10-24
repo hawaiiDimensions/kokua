@@ -7,9 +7,6 @@
 #' @param x A keyword for the data to be loaded or alternatively the URL where the data is located
 #' @param keyname The keyword to be assigned to the data in case that x is a URL
 #' 
-# @example 
-# haawe('islands')
-#' 
 #' @return Generated R script saved in the data directory of the kokua package.
 #'
 #' @author Edward Greg Huang <edwardgh@@berkeley.edu>
