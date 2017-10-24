@@ -1,5 +1,5 @@
 kokuaPlot <- function(dimensions = defaultDim, colorTemplate = defaultColors) {
-    obj <- list(dimensions , colorTemplate)
+    obj <- list(dimensions = dimensions , colors = colorTemplate)
     class(obj) <- append("kokuaPlot", class(obj))
     return(obj)
 }
@@ -18,8 +18,6 @@ huki.kokuaPlot <- function(KokuaPlot) {
     # kii <- plottingFunction()
     # # ...
     # # ...
-    # # ...
     # return(kii)
 }
-
 
