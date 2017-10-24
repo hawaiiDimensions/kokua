@@ -1,23 +1,13 @@
-kokuaPlot <- function(dimensions = defaultDim, colorTemplate = defaultColors) {
-    obj <- list(dimensions = dimensions , colors = colorTemplate)
-    class(obj) <- append("kokuaPlot", class(obj))
-    return(obj)
+createIke <- function(obj, envType) {
+    class(obj) <- 'ike'
+    attr(obj, 'envType') <- envType # like precip
 }
 
-huki <- function(kokuaPlot) {
-    UseMethod("huki", kokuaPlot)
+plot.ike <- function(x, col) {
+    if (is.missing(col)) {
+        col <- switch(attr(x, 'envType'),
+                      'precip' = x,
+                      'substrate' = y)
+    }
+    # plot the ike object
 }
-
-huki.default <- function(kokuaPlot) {
-    print("No such method defined for this object.")
-    return(kokuaPlot)
-}
-
-huki.kokuaPlot <- function(KokuaPlot) {
-    print("In huki.kokuaPlot")
-    # kii <- plottingFunction()
-    # # ...
-    # # ...
-    # return(kii)
-}
-
