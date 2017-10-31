@@ -2,31 +2,15 @@
 #'  
 #' @description \code{haawe} Organizes loaded data and generates an R script to load the data.
 #' 
-#' @details 
+#' @details stub
 #' 
 #' @param x A keyword for the data to be loaded or alternatively the URL where the data is located
 #' @param keyname The keyword to be assigned to the data in case that x is a URL
-#' 
-# @example 
-# haawe('islands')
 #' 
 #' @return Generated R script saved in the data directory of the kokua package.
 #'
 #' @author Edward Greg Huang <edwardgh@@berkeley.edu>
 #' @export
-
-## this version of the function uses keyword strings to download data. it needs a place to store
-## those keyword strings and their corresponding URLs. For that we can make a exported object
-## in the hdimDB package, something like:
-# #' @export
-# dataKeys <- data.frame(key = c('geol_niihau', 'geol_kauai'),
-#                        url = c('http://gis.ess.washington.edu/data/raster/tenmeter/hawaii/niihau.zip',
-#                                'http://gis.ess.washington.edu/data/raster/tenmeter/hawaii/kauai.zip'),
-#                        loaded = c(FALSE, FALSE))
-
-## then when the user uses `hdimDB` to load data, the function will check `dataKeys` to see if those
-## data are already loaded, if they aren't the function will load the data and update the `loaded`
-## column in `dataKeys`
 
 haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a keyname argument
     data(dataKeys, package = 'kokua') #  Loads tracker dataframe of spacial data
@@ -49,6 +33,19 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     }
     save(dataKeys, file = file.path(.libPaths(), 'kokua', 'data', 'dataKeys.RData')) #  Updates dataKeys file to reflect newly loaded data
 }
+
+## this version of the function uses keyword strings to download data. it needs a place to store
+## those keyword strings and their corresponding URLs. For that we can make a exported object
+## in the hdimDB package, something like:
+# #' @export
+# dataKeys <- data.frame(key = c('geol_niihau', 'geol_kauai'),
+#                        url = c('http://gis.ess.washington.edu/data/raster/tenmeter/hawaii/niihau.zip',
+#                                'http://gis.ess.washington.edu/data/raster/tenmeter/hawaii/kauai.zip'),
+#                        loaded = c(FALSE, FALSE))
+
+## then when the user uses `hdimDB` to load data, the function will check `dataKeys` to see if those
+## data are already loaded, if they aren't the function will load the data and update the `loaded`
+## column in `dataKeys`
 
 .loadData <- function(url, name, ext, dest) {
     filename <- paste(name, ext, sep = '.') #  Constructs full filename
