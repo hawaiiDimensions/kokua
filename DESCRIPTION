@@ -12,7 +12,10 @@ BugReports: https://github.com/hawaiiDimensions/kokua/issues
 LazyLoad: yes
 LazyData: true
 Depends:
-    R (>= 2.10)
+    R (>= 2.10),
+    sp,
+    rgdal,
+    raster
 Imports:
     sp,
     rgdal,
