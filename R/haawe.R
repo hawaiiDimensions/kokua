@@ -52,6 +52,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
 
 .loadData <- function(url, name, ext, dest) {
     filename <- paste(name, ext, sep = '.') #  Constructs full filename
+    browser()
     if (!file.exists(dest)) { #  If folder does not exist in target directory
         dir.create(dest) #  Creates new folder in the /data directory for file
     }
@@ -69,13 +70,23 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     # function (`raster` or `readOGR`) you need and combine this info, with the filename 
     # info into a string that, if read by R, would load the data. 
     # ....now that you have that (save the string object to a variable called `readFun`)....
-    readFun <- suppressWarnings(.readSelect(list.files(dest, recursive = TRUE))) #  Constructs lists of strings of load functions for each file
+    
+    ## #egh 
+    files <- list.files(dest, recursive = TRUE)
+    fileExts <- mapply(.fileExt, files)
+    fileInfo <- mapply(.readSelect, files, fileExts)
+    fileInfo <- fileInfo[!sapply(fileInfo, is.null)]
+    stopifnot(length(fileInfo) == 1)
+    fileInfo <- unlist(fileInfo)
+    
+    readFun <- .scriptSelect(fileInfo[1], fileInfo[2])
+    ## 
+    # readFun <- suppressWarnings(.readSelect(list.files(dest, recursive = TRUE))) #  Constructs lists of strings of load functions for each file
     # readFun <- readFun[!sapply(readFun, is.null)]
-    stopifnot(length(readFun) == 1)
-    readFun <- unlist(readFun)
+
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
     loadString <- c(sprintf('oldwd <- setwd("%s")', file.path(.libPaths(), 'kokua', 'data')),
-                    paste0(name, ' <- ', readFun), paste0(name, ' <- ', .readSelect(list.files(dest, recursive = TRUE), proj = TRUE, name = name)), ###TO FILL ##),# this should be a STRING that you make above
+                    paste0(name, ' <- ', readFun), paste0(name, ' <- ', .scriptSelect(fileInfo[1], fileInfo[2], proj = TRUE, name = name)), ###TO FILL ##),# this should be a STRING that you make above
                     # when you figure out the file extension and
                     # which function is needed for reading in
                     'setwd(oldwd) \n')
@@ -86,25 +97,32 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     # invisible(paste0(name, '.R'))
 }
 
-.readSelect <- function(files, proj = FALSE, name = 0) { #  Returns string of correct loador projection function when given spacial filename 
-    # For example, 
-    # if you detected a file named `kauai.bil` you would need a string that says:
-    # 'raster("kauai.bil")'
-    # if you detected a file called `hawaii_state_geol_ageClean.shp` you would need:
-    # readOGR('.', 'hawaii_state_geol_ageClean')
-    
-    # looks in directory and prioritizes '.bil'
-    exts <- mapply(.fileExt, files) #  Finds extensions
-    scripts <- mapply(.scriptSelect, files, exts, proj, name)
-    scripts <- scripts[!sapply(scripts, is.null)]
-    return(scripts)
+# .readSelect <- function(files, proj = FALSE, name = 0) { #  Returns string of correct loador projection function when given spacial filename 
+#     # For example, 
+#     # if you detected a file named `kauai.bil` you would need a string that says:
+#     # 'raster("kauai.bil")'
+#     # if you detected a file called `hawaii_state_geol_ageClean.shp` you would need:
+#     # readOGR('.', 'hawaii_state_geol_ageClean')
+#     
+#     # looks in directory and prioritizes '.bil'
+#     exts <- mapply(.fileExt, files) #  Finds extensions
+#     scripts <- mapply(.scriptSelect, files, exts, proj, name)
+#     scripts <- scripts[!sapply(scripts, is.null)]
+#     return(scripts)
+# }
+
+.readSelect <- function(file, ext) { #  Finds and returns target filename and file extension
+    switch(ext,
+           'bil' = c(file, ext),
+           'shp' = c(file, ext)
+           )
 }
 
-.scriptSelect <- function(f, ext, proj, name) {
+.scriptSelect <- function(file, ext, proj = FALSE, name = NULL) {
     if (proj == FALSE) {
         switch(ext,
-               'bil' = paste0("raster('", f, "')"),
-               'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', f), "')")
+               'bil' = paste0("raster('", file, "')"),
+               'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', file), "')")
         # 'tif' = 
         # 'kml' = 
         # support for addtional extensions to be added
