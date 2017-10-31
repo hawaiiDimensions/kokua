@@ -20,7 +20,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
         if (length(unloaded) == 0) { #  Stop if there are no unloaded matches
             stop('There are no unloaded data for the key specified') 
         } #  If the data aren't all loaded, load them with .loadData
-        mapply(.loadData, unloaded$url, unloaded$key, .fileExt(unloaded$url), file.path(.libPaths(), 'kokua', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
+        mapply(.loadData, unloaded$url, unloaded$key, .fileExt(unloaded$url), file.path(.libPaths(), 'kokua', 'data')) #  Downloads each previously unloaded file with helper function
         dataKeys[dataKeys$key %in% unloaded$key, 'loaded'] <- TRUE #  If successful, grep the keys in unloaded and change their $loaded value to TRUE
     } else {
         stopifnot(is.character(keyname)) #  Verifies that keyname is a character string
@@ -46,9 +46,9 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
 
 .loadData <- function(url, name, ext, dest) {
     filename <- paste(name, ext, sep = '.') #  Constructs full filename
-    if (!file.exists(dest)) { #  If folder does not exist in target directory
-        dir.create(dest) #  Creates new folder in the /data directory for file
-    }
+    # if (!file.exists(dest)) { #  If folder does not exist in target directory
+    #     dir.create(dest) #  Creates new folder in the /data directory for file
+    # }
     path <- file.path(dest, filename) #  Constructs filepath
     download.file(url = as.character(url), destfile = path, mode = 'wb') #  Downloads to target directory
     if (length(unzip(path, list = TRUE)) > 0) { #  Checks if file is compressed
@@ -77,7 +77,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     # readFun <- readFun[!sapply(readFun, is.null)]
     # broswer()
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
-    loadString <- c(sprintf('oldwd <- setwd("%s")', dest),
+    loadString <- c(sprintf('oldwd <- setwd("%s")', file.path(dest, name)),
                     paste0(name, ' <- ', readFun), paste0(name, ' <- ', .scriptSelect(fileInfo[1], fileInfo[2], proj = TRUE, name = name)), 
                     ###TO FILL ##),# this should be a STRING that you make above
                     # when you figure out the file extension and
