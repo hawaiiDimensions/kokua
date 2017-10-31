@@ -20,10 +20,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
         if (length(unloaded) == 0) { #  Stop if there are no unloaded matches
             stop('There are no unloaded data for the key specified') 
         } #  If the data aren't all loaded, load them with .loadData
-        mapply(.loadData, unloaded$url, 
-               unloaded$key, 
-               .fileExt(unloaded$url), 
-               file.path(.libPaths(), 'kokua', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
+        mapply(.loadData, unloaded$url, unloaded$key, .fileExt(unloaded$url), file.path(.libPaths(), 'kokua', 'data', unloaded$key)) #  Downloads each previously unloaded file with helper function
         dataKeys[dataKeys$key %in% unloaded$key, 'loaded'] <- TRUE #  If successful, grep the keys in unloaded and change their $loaded value to TRUE
     } else {
         stopifnot(is.character(keyname)) #  Verifies that keyname is a character string
@@ -49,7 +46,6 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
 
 .loadData <- function(url, name, ext, dest) {
     filename <- paste(name, ext, sep = '.') #  Constructs full filename
-    browser()
     if (!file.exists(dest)) { #  If folder does not exist in target directory
         dir.create(dest) #  Creates new folder in the /data directory for file
     }
@@ -70,20 +66,20 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     
     ## #egh 
     files <- list.files(dest, recursive = TRUE)
-    fileExts <- mapply(.fileExt, files)
-    fileInfo <- mapply(.readSelect, files, fileExts)
+    fileInfo <- mapply(.readSelect, files, mapply(.fileExt, files))
     fileInfo <- fileInfo[!sapply(fileInfo, is.null)]
     stopifnot(length(fileInfo) == 1)
     fileInfo <- unlist(fileInfo)
     
-    readFun <- .scriptSelect(fileInfo[1], fileInfo[2])
+    readFun <- .scriptSelect(fileInfo[1], fileInfo[2], name = name)
     ## 
     # readFun <- suppressWarnings(.readSelect(list.files(dest, recursive = TRUE))) #  Constructs lists of strings of load functions for each file
     # readFun <- readFun[!sapply(readFun, is.null)]
-
+    # broswer()
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
-    loadString <- c(sprintf('oldwd <- setwd("%s")', file.path(.libPaths(), 'kokua', 'data')),
-                    paste0(name, ' <- ', readFun), paste0(name, ' <- ', .scriptSelect(fileInfo[1], fileInfo[2], proj = TRUE, name = name)), ###TO FILL ##),# this should be a STRING that you make above
+    loadString <- c(sprintf('oldwd <- setwd("%s")', dest),
+                    paste0(name, ' <- ', readFun), paste0(name, ' <- ', .scriptSelect(fileInfo[1], fileInfo[2], proj = TRUE, name = name)), 
+                    ###TO FILL ##),# this should be a STRING that you make above
                     # when you figure out the file extension and
                     # which function is needed for reading in
                     'setwd(oldwd) \n')
@@ -119,7 +115,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     if (proj == FALSE) {
         switch(ext,
                'bil' = paste0("raster('", file, "')"),
-               'shp' = paste0("readOGR('.', '", gsub(paste0('.', ext), '', file), "')")
+               'shp' = paste0("readOGR('.', '", gsub(paste0('/', name, '.', ext), '', file), "')")
         # 'tif' = 
         # 'kml' = 
         # support for addtional extensions to be added
