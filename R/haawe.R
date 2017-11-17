@@ -76,16 +76,17 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     ## 
     # readFun <- suppressWarnings(.readSelect(list.files(dest, recursive = TRUE))) #  Constructs lists of strings of load functions for each file
     # readFun <- readFun[!sapply(readFun, is.null)]
-    # broswer()
+
     # use `writeLines` to put together (and save to /data) a simple R script that loads to datafile(s), something like:
     loadString <- c(sprintf('oldwd <- setwd("%s")', paste0(file.path(dest, name, subdirectory))),
                     paste0(name, ' <- ', readFun), 
                     .scriptSelect(fileInfo[1], fileInfo[2], proj = TRUE, name = name), 
                     'setwd(oldwd) \n')
-    # print(loadString)
     
     # eval(parse(text = loadString))
     #  If download was successful, the user is notified
+    writeLines(loadString, file.path(.libPaths(), 'kokua', 'data', paste0(name, '.R')))
+    data(name)
     cat(paste0(filename, ' successfully loaded. Downloaded data may be viewed by running: plot(', name,')'))
     return(loadString)
     # invisible(paste0(name, '.R'))
@@ -109,7 +110,8 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
         )
     } else {
         switch(ext,
-               # 'bil' = paste0('projectRaster(', name, ', crs = CRS("', '+proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0', '"))'),
+               'bil' = paste0('projectRaster(', name, ', crs = CRS("', '+proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0', '"))'),
+               # 
                'bil' = paste0('crs(', name, ') <- "+proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"'),
                'shp' = paste0(name, ' <- spTransform(', name,', CRS("', '+proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0', '"))')
                # 'tif' = 
@@ -124,7 +126,10 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     ifelse(pos > -1L, substring(path, pos + 1L), "")
 }
 
-listLoaded <- function() {
+getLoaded <- function(data = NULL) {
     loaded <- list.dirs(path = file.path(.libPaths(), 'kokua', 'data'), recursive = FALSE, full.names = FALSE)
-    return(loaded[loaded != ""])
+    if (is.null(data)) {
+        return(loaded[loaded != ""])
+    }
+    return(grepl(data, loaded))
 }
