@@ -86,7 +86,7 @@ haawe <- function(x, keyname = NULL) { # takes key/url and in case of url also a
     # eval(parse(text = loadString))
     #  If download was successful, the user is notified
     writeLines(loadString, file.path(.libPaths(), 'kokua', 'data', paste0(name, '.R')))
-    data(name)
+    data(list = name)
     cat(paste0(filename, ' successfully loaded. Downloaded data may be viewed by running: plot(', name,')'))
     return(loadString)
     # invisible(paste0(name, '.R'))
