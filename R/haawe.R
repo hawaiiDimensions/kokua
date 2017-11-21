@@ -29,14 +29,16 @@ haawe <- function(x, keyname = NULL, overwrite = FALSE) { # takes key/url and in
                 stop('All data for the specified query is already loaded. Overwrite not authorized.')
             }
         }
-        invisible(mapply(.loadData, keyData$url, keyData$key, .fileExt(keyData$url), file.path(.libPaths(), 'kokua', 'data'))) #  Downloads each previously unloaded file with helper function
+        loadedData <- invisible(mapply(.loadData, keyData$url, keyData$key, .fileExt(keyData$url), file.path(.libPaths(), 'kokua', 'data'))) #  Downloads each previously unloaded file with helper function
     } else {
         stopifnot(is.character(keyname)) #  Verifies that keyname is a character string
         if (overwrite == FALSE & ! is.null(getLoaded(keyname, exact == TRUE))) { 
             stop('Data is already loaded for the key specified. Overwrite not authorized.')
         }
-    invisible(.loadData(x, keyname, .fileExt(x), dest = file.path(.libPaths(), 'kokua', 'data')))
+    loadedData <- invisible(.loadData(x, keyname, .fileExt(x), dest = file.path(.libPaths(), 'kokua', 'data')))
     }
+    message('Finished! New data loaded: ', sapply(loadedData, paste0, ' '))
+    message('All loaded data: ', sapply(getLoaded(), paste0, ' '))
 }
 
 
@@ -88,10 +90,12 @@ haawe <- function(x, keyname = NULL, overwrite = FALSE) { # takes key/url and in
     
     #  If download was successful, the user is notified
     writeLines(loadString, file.path(.libPaths(), 'kokua', 'data', paste0(name, '.R')))
-    message('Attempting to load and reproject ', name, '...')
+    message('Loading and reprojecting ', name, '...')
     data(list = name)
     message(name, ' reprojected to the following coordinate reference system: +proj=utm +zone=4 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0')
-    message(writeLines(c(paste0(filename, ' successfully loaded. Downloaded data may be viewed by running: plot(', name,')'), '')))
+    message('Successfully loaded ', name, '. Downloaded data may be viewed by running: plot(', name,')')
+    message('')
+    return(name)
 }
 
 .readSelect <- function(file, ext) { #  Finds and returns target filename and file extension
