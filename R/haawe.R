@@ -1,13 +1,14 @@
-#' @title Prepares spacial data files to be loaded
+#' @title Loads spatial data files
 #'  
-#' @description \code{haawe} Organizes loaded data and generates an R script to load the data.
+#' @description \code{haawe} Downloads, organizes, and reprojects spatial data. Data may sourced from a reference dataframe provided in the package or alternatively specified by the user.
 #' 
 #' @details stub
 #' 
 #' @param x A keyword for the data to be loaded or alternatively the URL where the data is located
-#' @param keyname The keyword to be assigned to the data in case that x is a URL
+#' @param keyname The keyword to be assigned to the data in the case that x is a URL
+#' @param overwrite A boolean value specifying whether previously loaded data may be overwritten
 #' 
-#' @return Generated R script saved in the data directory of the kokua package.
+#' @return No return value. A summary message statement is generated upon success.
 #'
 #' @author Edward Greg Huang <edwardgh@@berkeley.edu>
 #' @export
