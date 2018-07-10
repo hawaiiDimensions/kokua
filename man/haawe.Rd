@@ -2,20 +2,22 @@
 % Please edit documentation in R/haawe.R
 \name{haawe}
 \alias{haawe}
-\title{Prepares spacial data files to be loaded}
+\title{Loads spatial data files}
 \usage{
-haawe(x, keyname = NULL)
+haawe(x, keyname = NULL, overwrite = FALSE)
 }
 \arguments{
 \item{x}{A keyword for the data to be loaded or alternatively the URL where the data is located}
 
-\item{keyname}{The keyword to be assigned to the data in case that x is a URL}
+\item{keyname}{The keyword to be assigned to the data in the case that x is a URL}
+
+\item{overwrite}{A boolean value specifying whether previously loaded data may be overwritten}
 }
 \value{
-Generated R script saved in the data directory of the kokua package.
+No return value. A summary message statement is generated upon success.
 }
 \description{
-\code{haawe} Organizes loaded data and generates an R script to load the data.
+\code{haawe} Downloads, organizes, and reprojects spatial data. Data may sourced from a reference dataframe provided in the package or alternatively specified by the user.
 }
 \details{
 stub
