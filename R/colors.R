@@ -105,6 +105,7 @@ plot(1:10, col = bar, pch = 16, cex = 5)
 #' 
 #' @author Edward Greg Huang <eghuang@@berkeley.edu>
 #' @seealso quantCol 
+#' @export
 
 anuenue <- function(data, type, trans = NULL, interval = NULL) {
     pal <- switch(type, # Currently implemented with toy palettes 
