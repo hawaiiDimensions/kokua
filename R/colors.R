@@ -1,40 +1,3 @@
-sfiColors <- c('#D68F85', '#005D77', '#51661A', '#D49A34', 
-               '#58455F', '#AF2F23', '#008E94', '#A27635', 
-               '#636051', '#DECEA1', '#D15A2A', '#CCCEC8', '#322B29')
-
-sfiColors <- terrain.colors(30)
-foo <- convertColor(t(col2rgb(sfiColors)) / 255, from = 'sRGB', to = 'Lab')
-foo[, 1] <- seq(40, 96, length.out = nrow(foo))
-sfiColors <- rgb(convertColor(foo, from = 'Lab', to = 'sRGB'))
-
-m <- persp(range(foo[, 2]), range(foo[, 3]), matrix(range(foo[, 1]), nrow = 2, ncol = 2), 
-           col = 'transparent', border = 'transparent', xlab = 'a', ylab = 'b', zlab = 'L', 
-           theta = 180, phi = 10)
-points(trans3d(foo[, 2], foo[, 3], foo[, 1], pmat = m), col = sfiColors, pch = 16, cex = 2)
-# text(trans3d(foo[, 2], foo[, 3], foo[, 1], pmat = m), labels = 1:length(sfiColors), col = 'white', cex = 0.5)
-
-
-# different color sets
-warm <- c(1, 4, 6, 8, 10, 11, 13)
-cool <- c(2, 3, 5, 7, 9, 12, 13)
-bigGradient <- c(2, 7, 3, 8, 4, 11, 6)
-divergent1 <- c(7, 12, 11)
-divergent2 <- c(2, 12, 4)
-divergent3 <- c(2, 12, 8)
-linear1 <- c(7, 9, 11)
-linear2 <- c(7, 13, 6)
-linear3 <- c(2, 9, 8)
-linear4 <- c(2, 9, 4)
-linear5 <- c(2, 12, 10)
-linear6 <- c(7, 10, 4)
-lilGradient1 <- c(5, 6, 11, 4)
-lilGradient2 <- c(5, 2, 7, 3)
-
-# package `scales` could be useful for interpolating colors
-foo <- scales::gradient_n_pal(sfiColors[lilGradient1])
-plot(1:10, col = foo(seq(0, 1, length.out = 10)), pch = 16, cex = 2)
-
-
 #' @title Return colors based on a palette and quantitative variable
 #'  
 #' @description Assign colors to the values of a variable
@@ -87,9 +50,6 @@ quantCol <- function(x, pal, trans = c('linear', 'log', 'quadratic', 'cubic'), x
     return(out)
 }
 
-bar <- quantCol(1:10, c("red", "blue"))
-plot(1:10, col = bar, pch = 16, cex = 5)
-
 
 
 #' @title anuenue
@@ -114,7 +74,7 @@ anuenue <- function(data, type, trans = NULL, interval = NULL) {
                   "age" = c("red", "purple"),
                   "precip" = c("cyan", "blue4"),
                   "temp" = c("yellow", "red"),
-                  "elevation" = c("grey48", "white") 
+                  "elevation" = .elev()
     )
     if (is.null(trans)) {
         t <- "linear"
@@ -124,5 +84,43 @@ anuenue <- function(data, type, trans = NULL, interval = NULL) {
     return(quantCol(data, pal, t, interval))
 }
 
+# hidden helper functions to create color pals for each data type
+.age <- function() {
+    cols <- viridis::magma(36)[-c(1:7, 34:36)]
+    colsLab <- convertColor(t(col2rgb(cols)) / 255, from = 'sRGB', to = 'Lab')
+    colsLab[, 1] <- seq(10, 95, length.out = nrow(colsLab))
+    cols <- rgb(convertColor(colsLab, from = 'Lab', to = 'sRGB'))
+    
+    return(cols)
+}
+
+.precip <- function() {
+    cols <- hsv(seq(0.45, 0.66, length.out = 20), seq(1, 0.5, length.out = 20), seq(0.1, 1, length.out = 20))
+    colsLab <- convertColor(t(col2rgb(cols)) / 255, from = 'sRGB', to = 'Lab')
+    colsLab[, 1] <- seq(10, 95, length.out = nrow(colsLab))
+    cols <- rgb(convertColor(colsLab, from = 'Lab', to = 'sRGB'))
+    
+    return(cols)
+}
+
+.temp <- function() {
+    cols <- heat.colors(30)[-c(1:3, 25:30)]
+    colsLab <- convertColor(t(col2rgb(cols)) / 255, from = 'sRGB', to = 'Lab')
+    colsLab[, 1] <- seq(35, 110, length.out = nrow(colsLab))
+    cols <- rgb(convertColor(colsLab, from = 'Lab', to = 'sRGB'))
+    
+    return(cols)
+}
+
+.elev <- function() {
+    cols <- terrain.colors(30)
+    colsLab <- convertColor(t(col2rgb(cols)) / 255, from = 'sRGB', to = 'Lab')
+    colsLab[, 1] <- seq(40, 96, length.out = nrow(colsLab))
+    cols <- rgb(convertColor(colsLab, from = 'Lab', to = 'sRGB'))
+    
+    return(cols)
+}
 
 
+# plot(1:20, col = quantCol(1:20, .age()), pch = 16, cex = 3, ylim = c(-1, 20))
+# points((1:20) - 2, col = quantCol(1:20, .temp()), pch = 16, cex = 3)
